@@ -1,88 +1,63 @@
 <?php
 
 use dokuwiki\plugin\oauth\Adapter;
-use dokuwiki\plugin\oauthgeneric\DotAccess;
-use dokuwiki\plugin\oauthgeneric\Generic;
+use dokuwiki\plugin\oauthdiscord\Discord;
 
 /**
  * Service Implementation for oAuth Doorkeeper authentication
  */
-class action_plugin_oauthgeneric extends Adapter
+class action_plugin_oauthdiscord extends Adapter
 {
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     */
     public function registerServiceClass()
     {
-        return Generic::class;
+        return Discord::class;
     }
 
-    /** * @inheritDoc */
+    /**
+     * @inheritDoc
+     */
     public function getUser()
     {
         $oauth = $this->getOAuthService();
         $data = array();
 
-        $url = $this->getConf('userurl');
-        $raw = $oauth->request($url);
+        // basic user data
+        $result = json_decode($oauth->request('https://discord.com/api/users/@me'), true);
+        $data['user'] = $result['username'];
+        $data['name'] = $result['global_name'];
 
-        if (!$raw) throw new OAuthException('Failed to fetch data from userurl');
-        $result = json_decode($raw, true);
-        if (!$result) throw new OAuthException('Failed to parse data from userurl');
-
-        $grpdots = sexplode('[]', $this->getConf('json-grps'), 2);
-        $user = DotAccess::get($result, $this->getConf('json-user'), '');
-        $name = DotAccess::get($result, $this->getConf('json-name'), '');
-        $mail = DotAccess::get($result, $this->getConf('json-mail'), '');
-        $grps = DotAccess::get($result, $grpdots[0], []);
-
-        // use dot notation on each group
-        if(is_array($grps) && $grpdots[1]) {
-            $grps = array_map(function($grp) use ($grpdots) {
-                return DotAccess::get($grp, $grpdots[1], '');
-            }, $grps);
+        if ($result['verified']) {
+            $data['mail'] = $result['email'];
         }
 
-        // type fixes
-        if (is_array($user)) $user = array_shift($user);
-        if (is_array($name)) $name = array_shift($name);
-        if (is_array($mail)) $mail = array_shift($mail);
-        if (!is_array($grps)) {
-            $grps = explode(',', $grps);
-            $grps = array_map('trim', $grps);
-        }
-
-        // fallbacks for user name
-        if (empty($user)) {
-            if (!empty($name)) {
-                $user = $name;
-            } elseif (!empty($mail)) {
-                list($user) = explode('@', $mail);
-            }
-        }
-
-        // fallback for full name
-        if (empty($name)) {
-            $name = $user;
-        }
-
-        return compact('user', 'name', 'mail', 'grps');
+        return $data;
     }
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     */
     public function getScopes()
     {
-        return $this->getConf('scopes');
+        return [Discord::SCOPE_IDENTIFY, Discord::SCOPE_EMAIL];
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     */
     public function getLabel()
     {
-        return $this->getConf('label');
+        return 'Discord';
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     */
     public function getColor()
     {
-        return $this->getConf('color');
+        return '#7289da';
     }
 }

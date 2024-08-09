@@ -1,7 +1,7 @@
-base   oauthgeneric
-author Andreas Gohr
-email  dokuwiki@cosmocode.de
-date   2024-03-21
-name   oauth generic Service
-desc   Generic Service for use with the oAuth Plugin
-url    http://www.dokuwiki.org/plugin:oauthgeneric
+base   oauthdiscord
+author David Sn
+email  divad.nnamtdeis@gmail.com
+date   2024-08-06
+name   oauth Discord Service
+desc   Discord Service for use with the oAuth Plugin
+url    http://www.dokuwiki.org/plugin:oauthdiscord
