@@ -7,3 +7,4 @@
 
 $lang['key'] = 'The Application UID';
 $lang['secret'] = 'The Application Secret';
+$lang['serverId'] = 'Allow members of specific server only';

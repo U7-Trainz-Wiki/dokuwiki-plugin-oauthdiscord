@@ -5,3 +5,4 @@
 
 $conf['key'] = '';
 $conf['secret'] = '';
+$conf['serverId'] = '';

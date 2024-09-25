@@ -5,3 +5,4 @@
 
 $meta['key'] = array('string');
 $meta['secret'] = array('password');
+$meta['serverId'] = array('string');
