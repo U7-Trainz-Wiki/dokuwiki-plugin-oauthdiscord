@@ -8,7 +8,6 @@ use dokuwiki\plugin\oauthdiscord\Discord;
  */
 class action_plugin_oauthdiscord extends Adapter
 {
-
     /**
      * @inheritdoc
      */
@@ -34,6 +33,17 @@ class action_plugin_oauthdiscord extends Adapter
             $data['mail'] = $result['email'];
         }
 
+        $serverId = $this->getConf('serverId');
+        if ($serverId) {
+            $resultGuilds = json_decode($oauth->request('https://discord.com/api/users/@me/guilds'), true);
+
+            $foundServer = array_column($resultGuilds, null, 'id')[$serverId] ?? false;
+
+            if (!$foundServer) {
+                return;
+            }
+        }
+
         return $data;
     }
 
@@ -42,7 +52,7 @@ class action_plugin_oauthdiscord extends Adapter
      */
     public function getScopes()
     {
-        return [Discord::SCOPE_IDENTIFY, Discord::SCOPE_EMAIL];
+        return [Discord::SCOPE_IDENTIFY, Discord::SCOPE_EMAIL, Discord::SCOPE_GUILDS];
     }
 
     /**

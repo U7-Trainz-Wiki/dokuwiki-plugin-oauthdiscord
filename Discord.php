@@ -13,6 +13,7 @@ class Discord extends AbstractOAuth2Base
     // Discord scopes
     const SCOPE_EMAIL = 'email';
     const SCOPE_IDENTIFY = 'identify';
+    const SCOPE_GUILDS = 'guilds';
 
     /**
      * @inheritdoc
